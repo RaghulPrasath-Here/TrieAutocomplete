@@ -1,4 +1,4 @@
-package TrieAutocomplete;
+package TrieAutocomplete.JavaTrie;
 public class TrieNode {
     TrieNode[] links = new TrieNode[26];
     boolean flag = false;

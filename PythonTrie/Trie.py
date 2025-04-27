@@ -3,7 +3,7 @@ from collections import defaultdict
 class TrieNode:
     def __init__(self, value):
         self.value = value
-        self.children = defaultdict()
+        self.children = {}
         self.isEnd = False
 
     def __str__(self):
@@ -47,24 +47,18 @@ class Trie:
 
 if __name__ == "__main__":
 
-    searchedWords = {}
-
     def dfs(node, string, result):
         if node.isEnd:
-
-            searchedWords[string] = searchedWords.get(string, 0) + 1
-
             result.append(string)
-        
+                  
         if len(node.children) == 0:
             return
 
         for child in node.children.values():
             dfs(child, string + child.value, result)
 
-    # words = ["flower","flow","flight", "clown", "aravind", "athreya", "clock", "aruna"]
-
     words = []
+    searchedWords = {}
 
     with open('words.txt', 'r', encoding='utf-8') as f:
         for line in f:
@@ -72,24 +66,39 @@ if __name__ == "__main__":
             if word:                    
                 words.append(word)
 
+    # initializing trie 
     trie = Trie()
 
     for word in words:
         trie.insert(word)
-
+    
     while True:
-        searchString = input("Enter word to search: ")
-
-        # finding the common node    
+        searchString = input("Enter a word to see all the words that starts with it : ")
+        
         node = trie.startsWith(searchString)
         result = []
-        #recursively find all the strings from that common node child
         if node:
             dfs(node, searchString, result)
         
-        # sorting the list based on the searchedWords
-        result_sorted = sorted(result, key=lambda w: searchedWords.get(w, 0), reverse=True)
-        print(result_sorted)
+        currentWordsCount = {}
+
+        for word in result:
+            if word not in searchedWords:
+                currentWordsCount[word] = 0
+            else:
+                currentWordsCount[word] = searchedWords[word]
+        
+        currentWordsCount = sorted(currentWordsCount.items(), key=lambda item: item[1], reverse=True)
+        currentWordsCount = currentWordsCount[0:10]
+        
+        print(f"\nWords that start with {searchString}")
+        print("\nChoose a word from the below list you want to search (1 for the 1st word)")
+        print(currentWordsCount)
+
+        choice = int(input())
+
+        searchedWords[str(currentWordsCount[choice - 1][0])] = currentWordsCount[choice - 1][1] + 1
+
         print(searchedWords)
 
         end = input("Stop searching? y or n: ").strip().lower()

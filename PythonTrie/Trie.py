@@ -47,30 +47,51 @@ class Trie:
 
 if __name__ == "__main__":
 
-    result = []
+    searchedWords = {}
 
-    def dfs(node, string):
+    def dfs(node, string, result):
         if node.isEnd:
+
+            searchedWords[string] = searchedWords.get(string, 0) + 1
+
             result.append(string)
         
         if len(node.children) == 0:
             return
 
         for child in node.children.values():
-            dfs(child, string + child.value)
+            dfs(child, string + child.value, result)
 
-    words = ["flower","flow","flight", "clown", "aravind", "athreya", "clock", "aruna"]
+    # words = ["flower","flow","flight", "clown", "aravind", "athreya", "clock", "aruna"]
+
+    words = []
+
+    with open('words.txt', 'r', encoding='utf-8') as f:
+        for line in f:
+            word = line.strip()          
+            if word:                    
+                words.append(word)
 
     trie = Trie()
 
     for word in words:
         trie.insert(word)
 
-    searchString = input("Enter word : ")
+    while True:
+        searchString = input("Enter word to search: ")
 
-    node = trie.startsWith(searchString)
+        # finding the common node    
+        node = trie.startsWith(searchString)
+        result = []
+        #recursively find all the strings from that common node child
+        if node:
+            dfs(node, searchString, result)
+        
+        # sorting the list based on the searchedWords
+        result_sorted = sorted(result, key=lambda w: searchedWords.get(w, 0), reverse=True)
+        print(result_sorted)
+        print(searchedWords)
 
-    if node:
-        dfs(node, searchString)
-    
-    print(result)
+        end = input("Stop searching? y or n: ").strip().lower()
+        if end == "y":
+            break
